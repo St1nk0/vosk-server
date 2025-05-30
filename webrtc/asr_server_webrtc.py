@@ -23,6 +23,8 @@ vosk_model_path = os.environ.get('VOSK_MODEL_PATH', '/root/vosk/vosk-model-small
 vosk_cert_file = os.environ.get('VOSK_CERT_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/fullchain.pem')
 vosk_key_file = os.environ.get('VOSK_KEY_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/privkey.pem')
 vosk_dump_file = os.environ.get('VOSK_DUMP_FILE', None)
+server_origin =  os.environ.get('SERVER_ORIGIN', 'http://localhost:80')
+server_origin_HTTPS =  os.environ.get('SERVER_ORIGIN_HTTPS', 'https://localhost:80')
 
 model = Model(vosk_model_path)
 pool = concurrent.futures.ThreadPoolExecutor((os.cpu_count() or 1))
@@ -152,12 +154,12 @@ async def app():
     app.router.add_post('/', offer)
 
     cors = aiohttp_cors.setup(app, defaults={
-    "https://chitayka.ant-projects.ru": aiohttp_cors.ResourceOptions(
+    server_origin_HTTPS: aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*"
         ),
-    "http://chitayka.ant-projects.ru": aiohttp_cors.ResourceOptions(
+    server_origin: aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*"
