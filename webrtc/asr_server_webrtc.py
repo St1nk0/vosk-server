@@ -7,6 +7,7 @@ import os
 import concurrent.futures
 import asyncio
 
+from dotenv import load_dotenv
 from pathlib import Path
 from vosk import KaldiRecognizer, Model
 from aiohttp import web
@@ -17,9 +18,11 @@ from av.audio.resampler import AudioResampler
 
 ROOT = Path(__file__).parent
 
+load_dotenv(dotenv_path=ROOT / '.env')
+
 vosk_interface = os.environ.get('VOSK_SERVER_INTERFACE', '0.0.0.0')
 vosk_port = int(os.environ.get('VOSK_SERVER_PORT', 2700))
-vosk_model_path = os.environ.get('VOSK_MODEL_PATH', '')
+vosk_model_path = os.getenv('VOSK_MODEL_PATH', '')
 vosk_cert_file = os.environ.get('VOSK_CERT_FILE', '')
 vosk_key_file = os.environ.get('VOSK_KEY_FILE', '')
 vosk_dump_file = os.environ.get('VOSK_DUMP_FILE', None)
