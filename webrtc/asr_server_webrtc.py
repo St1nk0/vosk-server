@@ -10,6 +10,7 @@ import asyncio
 from pathlib import Path
 from vosk import KaldiRecognizer, Model
 from aiohttp import web
+import aiohttp_cors
 from aiohttp.web_exceptions import HTTPServiceUnavailable
 from aiortc import RTCSessionDescription, RTCPeerConnection
 from av.audio.resampler import AudioResampler
@@ -18,9 +19,9 @@ ROOT = Path(__file__).parent
 
 vosk_interface = os.environ.get('VOSK_SERVER_INTERFACE', '0.0.0.0')
 vosk_port = int(os.environ.get('VOSK_SERVER_PORT', 2700))
-vosk_model_path = os.environ.get('VOSK_MODEL_PATH', 'model')
-vosk_cert_file = os.environ.get('VOSK_CERT_FILE', None)
-vosk_key_file = os.environ.get('VOSK_KEY_FILE', None)
+vosk_model_path = os.environ.get('VOSK_MODEL_PATH', '/root/vosk/vosk-model-small-ru-0.22')
+vosk_cert_file = os.environ.get('VOSK_CERT_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/fullchain.pem')
+vosk_key_file = os.environ.get('VOSK_KEY_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/privkey.pem')
 vosk_dump_file = os.environ.get('VOSK_DUMP_FILE', None)
 
 model = Model(vosk_model_path)
@@ -138,18 +139,38 @@ async def offer(request):
         }))
 
 
-if __name__ == '__main__':
-
-    if vosk_cert_file:
+async def app():
+    
+    """ if vosk_cert_file:
         ssl_context = ssl.SSLContext()
         ssl_context.load_cert_chain(vosk_cert_file, vosk_key_file)
-    else:
-        ssl_context = None
+    else: """
+
+    ssl_context = None
 
     app = web.Application()
-    app.router.add_post('/offer', offer)
+    app.router.add_post('/', offer)
 
-    app.router.add_get('/', index)
-    app.router.add_static('/static/', path=ROOT / 'static', name='static')
+    cors = aiohttp_cors.setup(app, defaults={
+    "https://chitayka.ant-projects.ru": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*"
+        ),
+    "http://chitayka.ant-projects.ru": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*"
+        )
+    })
+    
+    for route in list(app.router.routes()):
+        cors.add(route)
+        
+    return app
 
-    web.run_app(app, port=vosk_port, ssl_context=ssl_context)
+
+if __name__ == '__main__':
+    app = app()
+    web.run_app(app, port=vosk_port)
+    
