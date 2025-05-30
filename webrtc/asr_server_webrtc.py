@@ -19,9 +19,9 @@ ROOT = Path(__file__).parent
 
 vosk_interface = os.environ.get('VOSK_SERVER_INTERFACE', '0.0.0.0')
 vosk_port = int(os.environ.get('VOSK_SERVER_PORT', 2700))
-vosk_model_path = os.environ.get('VOSK_MODEL_PATH', '/root/vosk/vosk-model-small-ru-0.22')
-vosk_cert_file = os.environ.get('VOSK_CERT_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/fullchain.pem')
-vosk_key_file = os.environ.get('VOSK_KEY_FILE', '/etc/letsencrypt/live/chitayka.ant-projects.ru/privkey.pem')
+vosk_model_path = os.environ.get('VOSK_MODEL_PATH', '')
+vosk_cert_file = os.environ.get('VOSK_CERT_FILE', '')
+vosk_key_file = os.environ.get('VOSK_KEY_FILE', '')
 vosk_dump_file = os.environ.get('VOSK_DUMP_FILE', None)
 server_origin =  os.environ.get('SERVER_ORIGIN', 'http://localhost:80')
 server_origin_HTTPS =  os.environ.get('SERVER_ORIGIN_HTTPS', 'https://localhost:80')
